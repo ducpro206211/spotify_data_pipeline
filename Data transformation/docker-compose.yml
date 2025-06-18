@@ -1,0 +1,56 @@
+services:
+  spark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spotify_spark
+    volumes:
+      - ./spark_jobs:/app/spark_jobs
+      - ./data:/app/data
+    environment:
+      - SPARK_MODE=master
+      - SPARK_LOCAL_IP=spark
+      - SPARK_MASTER_URL=spark://spark:7077
+    ports:
+      - "4040:4040"  # Spark Application UI
+      - "8081:8080"  # Spark Master UI
+      - "8888:8888"  # Jupyter Notebook
+      - "7077:7077"  # Spark Master Port
+    networks:
+      - spotify_network
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -ln | grep -q ':8080 ' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  spark-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spotify_spark_worker
+    depends_on:
+      spark:
+        condition: service_healthy
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_LOCAL_IP=spark-worker
+      - SPARK_MASTER_URL=spark://spark:7077
+    volumes:
+      - ./spark_jobs:/app/spark_jobs
+      - ./data:/app/data
+    networks:
+      - spotify_network
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -ln | grep -q ':7077 ' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+networks:
+  spotify_network:
+    driver: bridge 

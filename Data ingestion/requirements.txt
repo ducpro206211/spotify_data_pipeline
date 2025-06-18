@@ -1,0 +1,4 @@
+spotipy==2.23.0
+pandas==2.0.3
+redpandas==0.1.0
+python-dotenv==1.0.0 
