@@ -43,4 +43,4 @@ python src/spotify_producer.py
 
 ## Dữ liệu
 
-Dữ liệu sẽ được lưu trong topic `spotify_playlists` trên Redpanda. Mỗi message chứa thông tin về một playlist từ Spotify. 
+Dữ liệu sẽ được lưu trong topic `spotify_playlists` trên Redpanda. Mỗi message chứa thông tin về một playlist từ Spotify.
